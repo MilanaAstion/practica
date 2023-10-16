@@ -4,7 +4,7 @@
 <head> 
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script> 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> 
     <title>VueJs Instance</title> 
     <style> 
         .red { 
@@ -33,6 +33,7 @@
         .center #source { 
             font-size: 30px; 
         } 
+        
     </style> 
 </head> 
  
@@ -43,19 +44,19 @@
         <input type="radio" name="author" v-model="isAuthor" value="">Немає автора 
  
         <br> 
-        <!-- {{isAuthor}}  -->
+        <!-- {{isAuthor}}  --> 
  
-        <div class="quote" v-for="qt in filteredQuotes" v-if="qt.source"> 
+        <div class="quote" v-for="qt in filteredQuotes" > 
             <h3 v-bind:class="qt.quote.length > 40 ? 'red' : 'black'">{{ qt.quote }}</h3> 
             <h5>{{ qt.source }}</h5> 
         </div> 
-
-        <button @click="sortBySource()">Сортувати</button>
-
-        <div class="quote" v-for="qt in sortedQuotes">
-            <h3>{{qt.quote}}</h3>
-            <h5>{{qt.source}}</h5>
-        </div>
+ 
+        <button @click="sortBySource()" class="button">Сортувати</button> 
+ 
+        <div class="quote" v-for="qt in sortedQuotes"> 
+            <h3>{{qt.quote}}</h3> 
+            <h5>{{qt.source}}</h5> 
+        </div> 
     </div> 
 </body> 
 <script type="text/javascript"> 
@@ -78,33 +79,28 @@
         } 
     ] 
  
-    new Vue({ 
-        el: '#app', 
-        data: { 
-            qoutes: quotesArray, 
-            isAuthor: "", 
-            sortedQuotes: [],
-        }, 
-        computed: { 
-            filteredQuotes: function () { 
-                return this.qoutes.filter(element => { 
-                    return Boolean(this.isAuthor) == Boolean(element.source); 
-               }) 
-            // var resArray = []; 
-            //  for(var i=0; i<this.qoutes.length; i++) { 
-            //    if(Boolean(this.isAuthor) == Boolean(this.qoutes[i].source)){ 
-            //      resArray.push (this.qoutes[i]); 
-            //    } 
-            //  } 
-            //  return resArray; 
+    const { createApp, ref, computed } = Vue; 
+    createApp({ 
+        setup() { 
+            const qoutes = ref(quotesArray) 
+            const isAuthor = ref('') 
+            const sortedQuotes = ref([]) 
+ 
+            const filteredQuotes = computed( () => { 
+                return qoutes.value.filter(element => { 
+                    return Boolean(isAuthor.value) == Boolean(element.source); 
+                }) 
             } 
-        },
-        methods: {
-            sortBySource(){
-                this.sortedQuotes = this.qoutes.sort((a,b) => (a.source > b.source) ? 1 : -1);
-            }
-        }
-    })  
+            ); 
+             sortBySource = function() { 
+               sortedQuotes.value = qoutes.value.sort((a, b) => (a.source > b.source) ? 1 : -1); 
+            } 
+             
+            return { 
+                qoutes, isAuthor, sortedQuotes, filteredQuotes, sortBySource 
+            } 
+        } 
+    }).mount('#app') 
 </script> 
  
 </html>
