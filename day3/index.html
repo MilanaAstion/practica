@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    #app {
+      max-width: 800px;
+      width: 100%;
+      padding: 20px;
+      background-color: #333;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      color: #fff;
+      display: block;
+    }
+
+    .search {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"] {
+      width: 97%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #333;
+    }
+
+    table th {
+      background-color: #333;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px;
+      text-align: left;
+    }
+
+    table td {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+
+    table a {
+      text-decoration: none;
+      color: blue;
+      cursor: pointer;
+    }
+
+    table a:hover {
+      color: darkblue;
+    }
+
+    .btnadd{
+    background-color: blue;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .add {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: white;
+      font-weight: 100;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <label for="search" class="search">Пошук:</label>
+    <input type="text" v-model="search" id="search" placeholder="Пошук за прізвищем">
+    <table>
+      <thead>
+        <tr>
+          <th>ПІБ</th>
+          <th>Група</th>
+          <th>Рік народження</th>
+          <th>Практика</th>
+          <th>Дії</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="student in filteredStudents" :key="student.id">
+          <td :style="{ color: student.highlight ? 'red' : 'white' }">{{ student.name }}</td>
+          <td>{{ student.group }}</td>
+          <td>{{ student.birthYear }}</td>
+          <td><input type="checkbox" v-model="student.checked"></td>
+          <td><a @click="deleteStudent(student.id)">Видалити</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="add">Додати нового студента</h2>
+    <form @submit.prevent="addStudent">
+      <input type="text" v-model="newStudent.name" placeholder="ПІБ" required>
+      <input type="text" v-model="newStudent.group" placeholder="Група" required>
+      <input type="text" v-model="newStudent.birthYear" placeholder="Рік народження" required>
+      <button type="submit" class="btnadd" >Додати студента</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        students: [
+          { id: 1, name: 'Іванов Іван', group: 'РПЗ 20 2/9', birthYear: 2004, checked: true },
+          { id: 2, name: 'Петров Петро', group: 'РПЗ 20 2/9', birthYear: 2004, checked: false },
+          { id: 3, name: 'Сидоров Олексій', group: 'РПЗ 20 2/9', birthYear: 2004, checked: true },
+        ],
+        search: '',
+        newStudent: {
+          name: '',
+          group: '',
+          birthYear: ''
+        }
+      },
+      computed: {
+        filteredStudents() {
+          if (!this.search) {
+            return this.students;
+          }
+          const search = this.search.toLowerCase();
+          return this.students.map(student => {
+            return {
+              ...student,
+              highlight: student.name.toLowerCase().includes(search)
+            };
+          });
+        }
+      },
+      methods: {
+        deleteStudent(id) {
+          const index = this.students.findIndex(student => student.id === id);
+          if (index !== -1) {
+            this.students.splice(index, 1);
+          }
+        },
+        addStudent() {
+          this.students.push({
+            id: this.students.length + 1,
+            ...this.newStudent,
+            checked: false
+          });
+
+          this.newStudent.name = '';
+          this.newStudent.group = '';
+          this.newStudent.birthYear = '';
+        }
+      }
+    });
+  </script>
+</body>
+</html>
