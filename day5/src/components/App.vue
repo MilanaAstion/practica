@@ -149,7 +149,6 @@ export default {
         });
     },
     editStudent(student) {
-      // Відкрити форму редагування і встановити дані для редагування
       this.editingStudent = JSON.parse(JSON.stringify(student));
     },
     updateStudent() {
