@@ -52,7 +52,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="student in filteredStudents" :key="student._id">
+        <tr v-for="(student, index) in filteredStudents" :key="student._id">
           <td>
             <img v-if="student.photo" :src="student.photo" alt="Фото студента" width="50">
             <img v-else src="default_photo_url" alt="Фото відсутнє" width="50">
@@ -69,7 +69,7 @@
             <a @click="removeStudent(student._id)" href="#">Видалити</a>
           </td>
           <td>
-            <button @click="editStudent(student)"><i class="fa-solid fa-pencil"></i></button>
+            <button @click="editStudent(index)"><i class="fa-solid fa-pencil"></i></button>
           </td>
         </tr>
       </tbody>
@@ -148,14 +148,18 @@ export default {
           console.error('Помилка при додаванні студента:', error);
         });
     },
-    editStudent(student) {
-      this.editingStudent = JSON.parse(JSON.stringify(student));
+    editStudent(index) {
+      // Відкрити форму редагування і встановити дані для редагування
+      this.editingStudent = {...this.filteredStudents[index], index};
+      // console.log();
     },
     updateStudent() {
       axios
         .put(`http://34.82.81.113:3000/students/${this.editingStudent._id}`, this.editingStudent)
-        .then(() => {
-          this.fetchStudents();
+        .then((response) => {
+          // this.fetchStudents();
+          this.filteredStudents[this.editingStudent.index] = response.data;
+          // console.log(response.data);
           this.cancelEdit();
         })
         .catch((error) => {
